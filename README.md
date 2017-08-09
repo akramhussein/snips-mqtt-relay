@@ -1,2 +1,2 @@
 # snips-mqtt-relay
-Snips app for relaying MQTT messages over BLE for the iOS app.
+App for relaying MQTT messages over BLE to the iOS app.
