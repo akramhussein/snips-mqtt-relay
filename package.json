@@ -30,5 +30,8 @@
     "ble-relay": "^0.1.0",
     "mqtt": "^2.11.0",
     "node-options": "0.0.7"
+  },
+  "bin": {
+    "snips-mqtt-relay": "./index.js"
   }
 }
