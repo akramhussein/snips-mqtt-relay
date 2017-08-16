@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/superlopuh/snips-mqtt-relay.git"
+    "url": "git+https://github.com/snipsco/snips-mqtt-relay.git"
   },
   "keywords": [
     "mqtt",
@@ -23,9 +23,9 @@
   "author": "Sasha Lopoukhine",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/superlopuh/snips-mqtt-relay/issues"
+    "url": "https://github.com/snipsco/snips-mqtt-relay/issues"
   },
-  "homepage": "https://github.com/superlopuh/snips-mqtt-relay#readme",
+  "homepage": "https://github.com/snipsco/snips-mqtt-relay#readme",
   "dependencies": {
     "ble-relay": "^0.1.0",
     "mqtt": "^2.11.0",
