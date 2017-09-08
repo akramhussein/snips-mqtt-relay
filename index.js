@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 'use strict';
 
-var _mqtt = require('mqtt');
-var _ble = require('ble-relay');
-var options = require('node-options');
+const _mqtt = require('mqtt');
+const _ble = require('ble-relay');
+const options = require('node-options');
+const exec = require('child_process').exec;
 
-
-var opts = {
+const opts = {
     serviceUUID : '025A7775-49AA-42BD-BBDB-E2AE77782966',
     characteristicUUID : 'F38A2C23-BC54-40FC-BED0-60EDDA139F47'
 }
 
 
-var result = options.parse(process.argv.slice(2), opts);
+const result = options.parse(process.argv.slice(2), opts);
 
 
 if (result.errors) {
@@ -21,8 +21,8 @@ if (result.errors) {
     process.exit(-1);
 }
 
-var mqttHost = 'localhost'
-var mqttPort = '9898'
+let mqttHost = 'localhost'
+let mqttPort = '9898'
 
 if (result.args) {
     if (result.args.length !== 2) {
@@ -47,13 +47,55 @@ var config = {
     }
 }
 
-var mqtt = _mqtt.connect(config.mqtt);
+const mqtt = _mqtt.connect(config.mqtt);
+
+const methods = {
+    postMQTT: (payload) => {
+        const mqtt = new Promise((resolve, reject) => {
+            mqtt.publish(payload.topic, new Buffer(payload.message, 'base64'), {}, (error, granted) => {
+                if (err) {
+                    resolve({ error });
+                } else {
+                    resolve({ success: "success" });
+                }
+            });
+        })
+    },
+    print: (payload) => {
+        return new Promis.resolve(console.log(payload))
+    },
+    shell: (payload) => {
+        return new Promise((resolve, reject) => {
+            console.log('execute shell');
+            exec(payload, function(error, stdout, stderr) {
+                console.log('finished executing shell');
+                const result = { error, stdout, stderr }
+                console.log('result: ' + result);
+                resolve(result)
+            });
+        });
+    }
+}
+
+let sendJSON = (json) => undefined;
+
+const sendResponse = (id, response) => {
+    sendJSON({response: {id: id, response: response}});
+}
+
+const sendMQTT = (topic, message) => {
+    sendJSON({mqtt: {topic: topic, message: message.toString('base64')}});
+}
 
 
 config.ble.onMessage = function(buffer) {
-    var json = JSON.parse(buffer);
-    var message = new Buffer(json.message, 'base64');
-    mqtt.publish(json.topic, message);
+    var message = JSON.parse(buffer);
+    console.log("received message" + JSON.stringify(message));
+    methods[message.function](message.payload)
+        .then((response) => {
+            console.log('rpc response: ' + response);
+            sendResponse(message.id, response);
+        });
 };
 
 config.ble.getReadData = function() { 
@@ -61,18 +103,18 @@ config.ble.getReadData = function() {
 };
 
 
-var ble = _ble.start(config.ble);
+const ble = _ble.start(config.ble);
+
+sendJSON = (response) => {
+    const jsonText = JSON.stringify(response);
+    console.log('sending ' + jsonText);
+    const buff = new Buffer(jsonText);
+    ble.sendMessage(buff);
+}
 
 
 mqtt.on('message', function (topic, message) {
-    // message is Buffer
-    var json = {
-        'topic': topic,
-        'message': message.toString('base64')
-    }
-    var text = JSON.stringify(json);
-    var buff = new Buffer(text);
-    ble.sendMessage(buff);
+    ble.sendMQTT(topic, message);
 });
 
 mqtt.on('connect', function () {
