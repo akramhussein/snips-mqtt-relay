@@ -1,6 +1,6 @@
 {
   "name": "snips-mqtt-relay",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "App for relaying MQTT messages over BLE to the iOS app.",
   "main": "index.js",
   "directories": {
