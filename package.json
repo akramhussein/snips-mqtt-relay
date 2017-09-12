@@ -27,9 +27,10 @@
   },
   "homepage": "https://github.com/snipsco/snips-mqtt-relay#readme",
   "dependencies": {
-    "ble-relay": "^0.1.0",
-    "mqtt": "^2.11.0",
-    "node-options": "0.0.7"
+    "bleno": "^0.4.2",
+    "mqtt": "^2.13.0",
+    "node-options": "0.0.7",
+    "simple-datagram-protocol": "^0.2.0"
   },
   "bin": {
     "snips-mqtt-relay": "./index.js"
